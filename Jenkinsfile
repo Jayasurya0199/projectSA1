@@ -44,6 +44,11 @@ pipeline {
         }
     }
 
-
-        
-
+    post {
+        always {
+            echo 'Cleaning up...'
+            sh "sudo docker rm -f staragilefinance-app || true"
+            sh "sudo docker rmi -f $IMAGE_NAME:latest || true"
+        }
+    }
+}
