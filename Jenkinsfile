@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'  // Replace with your Jenkins Docker Hub credentials ID
+        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
         IMAGE_NAME = 'jayasurya0199/staragilefinancev1'
         REPO_URL = 'https://github.com/Jayasurya0199/projectSA1.git'
     }
@@ -14,9 +14,19 @@ pipeline {
             }
         }
 
+        stage('Build Java Application') {
+            steps {
+                script {
+                    // Build the JAR file
+                    sh "mvn clean package -DskipTests"
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image using the created JAR file
                     docker.build(env.IMAGE_NAME)
                 }
             }
