@@ -1,29 +1,49 @@
 pipeline {
     agent any
-    stages{
-        stage('build project'){
-            steps{
-                git url:'https://github.com/Jayasurya0199/projectSA1/', branch: "master"
-                sh 'mvn clean package'
-              
-            }
-        }
-        stage('Build docker image'){
-            steps{
-                script{
-                    sh 'docker build -t jayasurya0199/staragileprojectfinance:v1 .'
-                    sh 'docker images'
-                }
-            }
-        }
-         
-        
-     stage('Deploy') {
-            steps {
-                sh 'sudo docker run -itd --name My-first-containe21211 -p 8083:8081 akshu20791/staragileprojectfinance:v1'
-                  
-                }
-            }
-        
+    
+    environment {
+        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'  // Replace with your Jenkins Docker Hub credentials ID
+        IMAGE_NAME = 'jayasurya0199/staragilefinancev1'
+        REPO_URL = 'https://github.com/Jayasurya0199/projectSA1.git'
     }
-}
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: env.REPO_URL
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build(env.IMAGE_NAME)
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('', env.DOCKERHUB_CREDENTIALS) {
+                        docker.image(env.IMAGE_NAME).push("latest")
+                    }
+                }
+            }
+        }
+
+        stage('Pull and Run Docker Container') {
+            steps {
+                script {
+                    sh """
+                    sudo docker pull $IMAGE_NAME:latest
+                    sudo docker run -itd --name staragilefinance-app -p 8085:80 $IMAGE_NAME:latest
+                    """
+                }
+            }
+        }
+    }
+
+
+        
+
