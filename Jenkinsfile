@@ -47,7 +47,7 @@ pipeline {
                 script {
                     sh """
                     sudo docker pull $IMAGE_NAME:latest
-                    sudo docker run -itd --name staragilefinance-app -p 8085:80 $IMAGE_NAME:latest
+                    sudo docker run -itd --name staragilefinance-app -p 8085:8081 $IMAGE_NAME:latest
                     """
                 }
             }
